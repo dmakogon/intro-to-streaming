@@ -60,12 +60,24 @@ FROM
 GROUP BY storeId,SlidingWindow(second,30)
 HAVING qcIssueCount > 20
 
-/* maybe have multiple sensors in a conveyor belt?
- - start
- - fry
- - fill
- - glaze 
- - sprinkle
- - heat
- - done?
-*/
+-- track down stores selling donuts that aren't sold anymore
+SELECT
+    [donutshop].storeId,
+    [donutshop].donutType,
+    System.TimeStamp AS 'windowEnd'
+INTO
+    [expiredpromotions]
+FROM
+    [donutshop]
+JOIN donuttypes
+ON [donutshop].donutType = [donutTypes].DonutName
+WHERE donutTypes.IsCurrent = '0'
+
+
+-- set up reference data to make sure only "current" donuts are being produced
+create table DonutTypes(Id Bigint,DonutName Nvarchar(max),IsCurrent BigInt);
+insert into dbo.DonutTypes (Id, DonutName, IsCurrent) values (1, 'chocolate',1)
+insert into dbo.DonutTypes (Id, DonutName, IsCurrent) values (2, 'plain',1)
+insert into dbo.DonutTypes (Id, DonutName, IsCurrent) values (3, 'blueberry',0)
+insert into dbo.DonutTypes (Id, DonutName, IsCurrent) values (4, 'boston creme',1)
+insert into dbo.DonutTypes (Id, DonutName, IsCurrent) values (5, 'coconut',1)
