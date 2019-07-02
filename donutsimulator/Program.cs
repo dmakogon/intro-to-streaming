@@ -25,7 +25,7 @@ namespace donutsimulator
 
         static int msDelayBetweenMessages;
 
-        static List<string> donutTypes = new List<string>() { "chocolate", "blueberry", "boston creme", "coconut", "plain" };
+        static List<string> donutTypes = new List<string>() { "chocolate", "blueberry", "boston creme", "coconut", "plain", "valentines heart" };
         private static async void SendDeviceToCloudMessagesAsync()
         {
             Random rand = new Random();
@@ -46,13 +46,16 @@ namespace donutsimulator
                         totalQCFail++;
                 }
 
+                // Just for fun: Let's assume there's one store (store #1) still selling an expired promotion (valentines heart)
+                var currentStoreId = rand.Next(numberOfStores)+1;
+                var donutTypeCount = (currentStoreId == 1 ? donutTypes.Count : donutTypes.Count - 1);
 
                 var donutDataPoint = new
                 {
                     id = Guid.NewGuid(),
-                    storeId = rand.Next(numberOfStores)+1,
+                    storeId = currentStoreId,
                     eventTime = DateTime.UtcNow,
-                    donutType = donutTypes[rand.Next(donutTypes.Count)],
+                    donutType = donutTypes[rand.Next(donutTypeCount)],
                     donutCount = rand.Next(maxNumberOfDonuts),
                     qcIssueCount = totalQCFail,
                     partitionId = "1"
